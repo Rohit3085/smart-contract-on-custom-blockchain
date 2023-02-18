@@ -1,0 +1,53 @@
+pragma solidity >=0.4.16 <0.9.0;
+
+contract rho_coins_ico{
+
+    // total number of rho coins for sale
+    uint public total_rho_coins = 1000000;
+
+    //conversion of 1 rupee to rho_coins
+    uint public rupee_to_rhocoins = 10;
+
+    //total rho coins bought by investor
+    uint public total_rho_coins_bought = 0;
+
+    //mapping of address to rho coins
+    mapping(address => uint) equity_rhocoins;
+
+    //mapping of address to rupee
+    mapping(address => uint) equity_rupee;
+
+    //checking if investors can buy rhocoins or not
+
+    modifier can_buy_rhocoins(uint rupees_invested){
+        require(rupees_invested*10 + total_rho_coins_bought <=total_rho_coins);
+        _;
+    }
+
+    // function for getting equity of investore in rupees
+    function equity_in_rhocoins(address investor) external view returns (uint){
+        return equity_rhocoins[investor];
+    }
+
+    // function for getting equity of investor in rhocoins
+    function equity_in_rupees(address investor) external view returns (uint){
+        return equity_rupee[investor];
+    }
+
+    // buying rhocoins
+    function buy_rhocoins(address investor, uint rupees_invested) external
+    can_buy_rhocoins(rupees_invested){
+        uint rhocoins_bought = rupees_invested*10;
+        equity_rhocoins[investor]+= rhocoins_bought;
+        equity_rupee[investor]= equity_rhocoins[investor]/rupee_to_rhocoins;
+        total_rho_coins_bought+= rhocoins_bought;
+    }
+
+    // To sell rhocoins
+
+    function sell_rhocoins(address investor, uint rhocoins_to_sell) external{
+        equity_rhocoins[investor] -= rhocoins_to_sell;
+        equity_rupee[investor] = equity_rhocoins[investor]/10;
+        total_rho_coins_bought -= rhocoins_to_sell;
+    }
+}
